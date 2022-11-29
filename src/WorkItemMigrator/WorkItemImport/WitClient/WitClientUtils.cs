@@ -467,13 +467,27 @@ namespace WorkItemImport
             // Save attachments
             foreach (WiAttachment attachment in rev.Attachments)
             {
-                if (attachment.Change == ReferenceChangeType.Added)
+                try
                 {
-                   AddSingleAttachmentToWorkItemAndSave(attachment, wi);
+                    if (attachment.Change == ReferenceChangeType.Added)
+                    {
+                       AddSingleAttachmentToWorkItemAndSave(attachment, wi);
+                    }
+                    else if (attachment.Change == ReferenceChangeType.Removed)
+                    {
+                        RemoveSingleAttachmentFromWorkItemAndSave(attachment, wi);
+                    }
                 }
-                else if (attachment.Change == ReferenceChangeType.Removed)
+                catch (Exception ex)
                 {
-                    RemoveSingleAttachmentFromWorkItemAndSave(attachment, wi);
+                    try
+                    {
+                        Logger.Log(ex, $"Failed to import attachment '{attachment.ToString()}'.");
+                    }
+                    catch (Exception)
+                    {
+                        throw ex; // yes, the ex from the nesting catch block
+                    }
                 }
             }
         }
