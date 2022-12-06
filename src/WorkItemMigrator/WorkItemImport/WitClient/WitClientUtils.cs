@@ -480,14 +480,7 @@ namespace WorkItemImport
                 }
                 catch (Exception ex)
                 {
-                    try
-                    {
-                        Logger.Log(ex, $"Failed to import attachment '{attachment.ToString()}'.");
-                    }
-                    catch (Exception)
-                    {
-                        throw ex; // yes, the ex from the nesting catch block
-                    }
+                    Logger.Log(ex, $"Failed to import attachment '{attachment.ToString()}'.");
                 }
             }
         }
