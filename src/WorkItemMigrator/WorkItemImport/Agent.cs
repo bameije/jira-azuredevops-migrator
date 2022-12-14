@@ -488,6 +488,11 @@ namespace WorkItemImport
                                 else
                                     areaPath = string.Join("/", areaPath, (string)fieldValue);
                             }
+                            else if (fieldValue is null)
+                            {
+                                Logger.Log(LogLevel.Warning, $"Skipping null AreaPath (keep original mapping '{wi.Fields[WiFieldReference.AreaPath]}').");
+                                break;
+                            }
 
                             // handle usage of ../ (TFS doesn't handle it)
                             Regex r = new Regex(@"[^/\.]+/\.\./");
