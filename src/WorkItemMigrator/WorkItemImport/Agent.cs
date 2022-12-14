@@ -18,6 +18,7 @@ using WebModel = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace WorkItemImport
 {
@@ -486,6 +487,21 @@ namespace WorkItemImport
                                     areaPath = (string)fieldValue;
                                 else
                                     areaPath = string.Join("/", areaPath, (string)fieldValue);
+                            }
+
+                            // handle usage of ../ (TFS doesn't handle it)
+                            Regex r = new Regex(@"[^/\.]+/\.\./");
+                            var areaPathOrig = "";
+                            while (areaPathOrig != areaPath) // repeat until no more replacements are made
+                            {
+                                areaPathOrig = areaPath;
+                                areaPath = r.Replace(areaPath, "");
+                            }
+
+                            // areaPath should no longer contain '../', if we don't throw the error then TFS would.
+                            if (areaPath.Contains("../"))
+                            {
+                                throw new Exception($"AreaPath contains '../' but no parent directory: '{areaPath}'");
                             }
 
                             if (!string.IsNullOrWhiteSpace(areaPath))
